@@ -1,0 +1,22 @@
+$schema: 'http://json-schema.org/draft-04/schema#'
+description: ''
+type: object
+properties:
+  temperature:
+    type: number
+  max:
+    type: number
+  min:
+    type: number
+  latitude:
+    type: number
+  longitude:
+    type: number
+example: |-
+  {
+      "temperature":0,
+      "max":0,
+      "min":0,
+      "latitude":0,
+      "longitude":0
+  }

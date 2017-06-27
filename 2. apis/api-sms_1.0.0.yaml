@@ -1,0 +1,106 @@
+---
+swagger: "2.0"
+info:
+  x-ibm-name: "api-sms"
+  title: "api-sms"
+  version: "1.0.0"
+schemes:
+- "https"
+host: "$(catalog.host)"
+basePath: "/api-sms"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+securityDefinitions:
+  clientIdHeader:
+    type: "apiKey"
+    in: "header"
+    name: "X-IBM-Client-Id"
+security:
+- clientIdHeader: []
+x-ibm-configuration:
+  testable: true
+  enforced: true
+  cors:
+    enabled: true
+  assembly:
+    execute:
+    - gatewayscript:
+        title: "gatewayscript"
+        version: "1.0.0"
+        source: "var prefix = \"52\";\nvar number = apim.getvariable('request.parameters.number');\n\
+          var number = prefix.concat(number);\n\napim.setvariable('number',number);"
+    - invoke:
+        title: "send sms"
+        timeout: 60
+        verb: "GET"
+        cache-response: "no-cache"
+        cache-ttl: 900
+        stop-on-error:
+        - null
+        version: "1.0.0"
+        target-url: "https://unambootcamp.lbaeza.com/sendsms?To=$(number)&Message={message}"
+        output: "sms_response"
+    - map:
+        title: "map"
+        inputs:
+          sms:
+            schema:
+              description: ""
+              type: "object"
+              properties:
+                sid:
+                  type: "string"
+                  name: "sid"
+                status:
+                  type: "string"
+                  name: "status"
+                to:
+                  type: "string"
+                  name: "to"
+                body:
+                  type: "string"
+                  name: "body"
+            variable: "sms_response"
+            content: "application/json"
+        outputs:
+          response:
+            schema:
+              description: ""
+              type: "object"
+              properties:
+                status:
+                  type: "string"
+                  name: "status"
+                body:
+                  type: "string"
+                  name: "body"
+              example: "{\n    \"status\": \"\",\n    \"body\": \"\"\n}"
+            variable: "message.body"
+            content: "application/json"
+        actions:
+        - set: "response.status"
+          from: "sms.status"
+        - set: "response.body"
+          from: "sms.body"
+        version: "1.0.0"
+    catch: []
+  phase: "realized"
+  gateway: "datapower-gateway"
+paths:
+  /sendsms:
+    get:
+      responses:
+        200:
+          description: "200 OK"
+    parameters:
+    - name: "message"
+      type: "string"
+      required: true
+      in: "query"
+    - name: "number"
+      type: "string"
+      required: true
+      in: "query"
+tags: []
