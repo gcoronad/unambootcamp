@@ -1,0 +1,5 @@
+---
+applications:
+- name:    lgbc-hello-node
+  host:    lgbc-hello-node
+  memory:  256M
